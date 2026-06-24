@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة التحكم - Nestora</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+    --primary: #A8703F;
+    --primary-dark: #7A4F2C;
+    --secondary: #5C6B4F;
+    --accent: #B5763E;
+    --success: #6B8F5C;
+    --danger: #B0473D;
+    --dark: #2E2A24;
+    --dark-light: #3F3A32;
+    --gray: #7A746A;
+    --light: #FAF6F0;
+    --white: #ffffff;
+    --shadow: 0 4px 20px rgba(46,42,36,0.1);
+    --shadow-lg: 0 10px 40px rgba(46,42,36,0.15);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --transition: all 0.3s ease;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Tajawal', sans-serif; background: var(--light); color: var(--dark); min-height: 100vh; }
+
+.login-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+.login-box { background: var(--white); padding: 40px; border-radius: var(--radius); box-shadow: var(--shadow-lg); text-align: center; max-width: 400px; width: 90%; }
+.login-box h1 { color: var(--primary); font-size: 2rem; margin-bottom: 10px; }
+.login-box p { color: var(--gray); margin-bottom: 30px; }
+.pin-inputs { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+.pin-input { width: 50px; height: 60px; border: 2px solid #e2e8f0; border-radius: var(--radius-sm); text-align: center; font-size: 1.5rem; font-weight: 700; font-family: 'Tajawal', sans-serif; transition: var(--transition); }
+.pin-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(168, 112, 63, 0.1); }
+.login-btn { width: 100%; padding: 16px; border: none; border-radius: 50px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: var(--white); font-family: 'Tajawal', sans-serif; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: var(--transition); }
+.login-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(168, 112, 63, 0.4); }
+.error-msg { color: var(--danger); font-size: 0.9rem; margin-top: 10px; display: none; }
+
+.admin-panel { display: none; min-height: 100vh; }
+.admin-header { background: var(--white); padding: 15px 30px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+.admin-header h1 { font-size: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+.admin-header .actions { display: flex; gap: 10px; }
+.btn { padding: 10px 20px; border-radius: 50px; font-weight: 700; font-family: 'Tajawal', sans-serif; cursor: pointer; border: none; transition: var(--transition); display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-size: 0.9rem; }
+.btn-primary { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: var(--white); }
+.btn-success { background: var(--success); color: var(--white); }
+.btn-danger { background: var(--danger); color: var(--white); }
+.btn-outline { background: transparent; color: var(--dark); border: 2px solid #e2e8f0; }
+.btn:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 30px; max-width: 1400px; margin: 0 auto; }
+.stat-card { background: var(--white); padding: 25px; border-radius: var(--radius); box-shadow: var(--shadow); display: flex; align-items: center; gap: 15px; }
+.stat-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--white); }
+.stat-icon.blue { background: linear-gradient(135deg, #6F8E9C, #4F6F7C); }
+.stat-icon.green { background: linear-gradient(135deg, #6B8F5C, #4F6F7C); }
+.stat-icon.orange { background: linear-gradient(135deg, #C68846, #A85A3A); }
+.stat-icon.red { background: linear-gradient(135deg, #B5763E, #B0473D); }
+.stat-info h3 { font-size: 1.8rem; color: var(--dark); }
+.stat-info p { color: var(--gray); font-size: 0.9rem; }
+
+.tabs-container { max-width: 1400px; margin: 0 auto; padding: 0 30px; }
+.tabs-nav { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+.tab-btn { padding: 10px 20px; border: none; background: none; font-family: 'Tajawal', sans-serif; font-weight: 700; color: var(--gray); cursor: pointer; transition: var(--transition); border-radius: 50px; }
+.tab-btn:hover, .tab-btn.active { background: var(--primary); color: var(--white); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.table-container { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 30px; }
+.table-header { padding: 20px 25px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+.table-header h2 { font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th, .data-table td { padding: 15px 20px; text-align: right; border-bottom: 1px solid #e2e8f0; }
+.data-table th { background: var(--light); font-weight: 700; color: var(--dark); font-size: 0.9rem; }
+.data-table tr:hover { background: var(--light); }
+.data-table td { font-size: 0.9rem; }
+.product-img-small { width: 50px; height: 50px; border-radius: var(--radius-sm); object-fit: cover; border: 1px solid #e2e8f0; }
+.actions-cell { display: flex; gap: 5px; }
+.action-btn { width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); font-size: 0.9rem; }
+.action-btn.edit { background: #e0f2fe; color: #0369a1; }
+.action-btn.delete { background: #fee2e2; color: #dc2626; }
+.action-btn:hover { transform: scale(1.1); }
+
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: var(--transition); }
+.modal-overlay.active { opacity: 1; visibility: visible; }
+.modal { background: var(--white); border-radius: var(--radius); max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; transform: scale(0.9); transition: var(--transition); }
+.modal-overlay.active .modal { transform: scale(1); }
+.modal-header { padding: 20px 25px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+.modal-header h3 { font-size: 1.2rem; }
+.modal-close { background: none; border: none; font-size: 1.5rem; color: var(--gray); cursor: pointer; }
+.modal-body { padding: 25px; }
+.modal-footer { padding: 15px 25px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px; }
+
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-weight: 700; margin-bottom: 8px; color: var(--dark); font-size: 0.95rem; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px 15px; border: 2px solid #e2e8f0; border-radius: var(--radius-sm); font-family: 'Tajawal', sans-serif; font-size: 1rem; transition: var(--transition); }
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(168, 112, 63, 0.1); }
+.form-group textarea { resize: vertical; min-height: 80px; }
+
+.image-upload-area { border: 2px dashed #e2e8f0; border-radius: var(--radius-sm); padding: 30px; text-align: center; cursor: pointer; transition: var(--transition); position: relative; }
+.image-upload-area:hover { border-color: var(--primary); background: rgba(168, 112, 63, 0.05); }
+.image-upload-area i { font-size: 2.5rem; color: var(--gray); margin-bottom: 10px; }
+.image-upload-area p { color: var(--gray); font-size: 0.9rem; }
+.image-upload-area input[type="file"] { position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.image-preview { max-width: 200px; max-height: 200px; border-radius: var(--radius-sm); margin-top: 10px; display: none; }
+.image-preview.show { display: block; }
+
+.toast-container { position: fixed; top: 20px; left: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+.toast { background: var(--dark); color: var(--white); padding: 15px 20px; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-lg); animation: slideIn 0.4s ease; min-width: 280px; }
+.toast.success { border-right: 4px solid var(--success); }
+.toast.error { border-right: 4px solid var(--danger); }
+@keyframes slideIn { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+
+.loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 10000; display: none; }
+.loading-overlay.active { display: flex; }
+.spinner { width: 50px; height: 50px; border: 4px solid #e2e8f0; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty-state { text-align: center; padding: 60px 20px; color: var(--gray); }
+.empty-state i { font-size: 4rem; margin-bottom: 15px; opacity: 0.3; }
+
+.badge { padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
+.badge-sale { background: var(--danger); color: var(--white); }
+.badge-new { background: var(--success); color: var(--white); }
+.badge-hot { background: #8B6914; color: var(--white); }
+
+@media (max-width: 768px) {
+    .admin-header { padding: 15px 20px; flex-direction: column; gap: 10px; }
+    .stats-grid { padding: 20px; }
+    .tabs-container { padding: 0 20px; }
+    .data-table { font-size: 0.85rem; }
+    .data-table th, .data-table td { padding: 10px; }
+    .product-img-small { width: 40px; height: 40px; }
+}
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+    <div class="login-box">
+        <i class="fas fa-lock" style="font-size: 3rem; color: var(--primary); margin-bottom: 15px;"></i>
+        <h1>لوحة التحكم</h1>
+        <p>أدخلي رمز PIN للدخول</p>
+        <div class="pin-inputs" id="pinInputs">
+            <input type="password" class="pin-input" maxlength="1" data-index="0">
+            <input type="password" class="pin-input" maxlength="1" data-index="1">
+            <input type="password" class="pin-input" maxlength="1" data-index="2">
+            <input type="password" class="pin-input" maxlength="1" data-index="3">
+            <input type="password" class="pin-input" maxlength="1" data-index="4">
+            <input type="password" class="pin-input" maxlength="1" data-index="5">
+        </div>
+        <button class="login-btn" onclick="checkPin()">
+            <i class="fas fa-sign-in-alt"></i> دخول
+        </button>
+        <p class="error-msg" id="loginError">رمز PIN غير صحيح</p>
+    </div>
+</div>
+
+<div class="admin-panel" id="adminPanel">
+    <header class="admin-header">
+        <h1><i class="fas fa-cog"></i> Nestora - لوحة التحكم</h1>
+        <div class="actions">
+            <a href="index.html" class="btn btn-outline" target="_blank">
+                <i class="fas fa-external-link-alt"></i> عرض الموقع
+            </a>
+            <button class="btn btn-danger" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> خروج
+            </button>
+        </div>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="fas fa-box"></i></div>
+            <div class="stat-info"><h3 id="statsProducts">0</h3><p>المنتجات</p></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="fas fa-shopping-cart"></i></div>
+            <div class="stat-info"><h3 id="statsOrders">0</h3><p>الطلبات</p></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon orange"><i class="fas fa-fire"></i></div>
+            <div class="stat-info"><h3 id="statsOffers">0</h3><p>العروض</p></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon red"><i class="fas fa-money-bill-wave"></i></div>
+            <div class="stat-info"><h3 id="statsRevenue">0</h3><p>إجمالي المبيعات</p></div>
+        </div>
+    </div>
+
+    <div class="tabs-container">
+        <div class="tabs-nav">
+            <button class="tab-btn active" onclick="switchTab('products')">
+                <i class="fas fa-box"></i> المنتجات
+            </button>
+            <button class="tab-btn" onclick="switchTab('orders')">
+                <i class="fas fa-shopping-cart"></i> الطلبات
+            </button>
+            <button class="tab-btn" onclick="switchTab('offers')">
+                <i class="fas fa-fire"></i> العروض
+            </button>
+        </div>
+
+        <div class="tab-content active" id="productsTab">
+            <div class="table-container">
+                <div class="table-header">
+                    <h2><i class="fas fa-box"></i> المنتجات</h2>
+                    <button class="btn btn-success" onclick="openProductModal()">
+                        <i class="fas fa-plus"></i> منتج جديد
+                    </button>
+                </div>
+                <table class="data-table" id="productsTable">
+                    <thead><tr><th>الصورة</th><th>الاسم</th><th>القسم</th><th>السعر</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
+                    <tbody id="productsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="ordersTab">
+            <div class="table-container">
+                <div class="table-header"><h2><i class="fas fa-shopping-cart"></i> الطلبات</h2></div>
+                <table class="data-table" id="ordersTable">
+                    <thead><tr><th>رقم الطلب</th><th>العميل</th><th>الهاتف</th><th>المنتجات</th><th>الإجمالي</th><th>التاريخ</th></tr></thead>
+                    <tbody id="ordersTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="offersTab">
+            <div class="table-container">
+                <div class="table-header">
+                    <h2><i class="fas fa-fire"></i> العروض</h2>
+                    <button class="btn btn-success" onclick="openOfferModal()">
+                        <i class="fas fa-plus"></i> عرض جديد
+                    </button>
+                </div>
+                <table class="data-table" id="offersTable">
+                    <thead><tr><th>العنوان</th><th>الخصم</th><th>السعر القديم</th><th>السعر الجديد</th><th>الإجراءات</th></tr></thead>
+                    <tbody id="offersTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="productModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="productModalTitle"><i class="fas fa-box"></i> منتج جديد</h3>
+            <button class="modal-close" onclick="closeProductModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="productId">
+            <div class="form-group">
+                <label>الصورة</label>
+                <div class="image-upload-area" id="imageUploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>اضغطي هنا أو اسحبي صورة</p>
+                    <p style="font-size: 0.8rem; margin-top: 5px;">PNG, JPG, WEBP (Max 2MB)</p>
+                    <input type="file" id="productImageFile" accept="image/*" onchange="handleImageUpload(event)">
+                </div>
+                <img class="image-preview" id="imagePreview" alt="Preview">
+                <input type="hidden" id="productImageBase64">
+            </div>
+            <div class="form-group">
+                <label>اسم المنتج *</label>
+                <input type="text" id="productName" placeholder="مثال: منظم أدراج مطبخ">
+            </div>
+            <div class="form-group">
+                <label>القسم *</label>
+                <select id="productCategory">
+                    <option value="kitchen">المطبخ</option>
+                    <option value="bathroom">الحمام</option>
+                    <option value="bedroom">غرفة النوم</option>
+                    <option value="living">غرفة المعيشة</option>
+                    <option value="laundry">غسيل الملابس</option>
+                    <option value="cleaning">تنظيف عام</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex: 1;">
+                    <label>السعر *</label>
+                    <input type="number" id="productPrice" placeholder="89">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>السعر القديم (اختياري)</label>
+                    <input type="number" id="productOldPrice" placeholder="120">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>الوصف</label>
+                <textarea id="productDesc" placeholder="وصف المنتج..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>التاجات (مفصولة بفاصلة)</label>
+                <input type="text" id="productTags" placeholder="تنظيم, تخزين, مطبخ">
+            </div>
+            <div class="form-group">
+                <label>الشارة</label>
+                <select id="productBadge">
+                    <option value="">بدون</option>
+                    <option value="sale">خصم</option>
+                    <option value="new">جديد</option>
+                    <option value="hot">الأكثر مبيعاً</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeProductModal()">إلغاء</button>
+            <button class="btn btn-primary" onclick="saveProduct()">
+                <i class="fas fa-check"></i> حفظ
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="offerModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-fire"></i> عرض جديد</h3>
+            <button class="modal-close" onclick="closeOfferModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>عنوان العرض *</label>
+                <input type="text" id="offerTitle" placeholder="مثال: باقة التنظيف الشاملة">
+            </div>
+            <div class="form-group">
+                <label>الوصف</label>
+                <textarea id="offerDesc" placeholder="محتوى الباقة..."></textarea>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex: 1;">
+                    <label>السعر القديم *</label>
+                    <input type="number" id="offerOldPrice" placeholder="535">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>السعر الجديد *</label>
+                    <input type="number" id="offerNewPrice" placeholder="399">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>نسبة الخصم</label>
+                <input type="text" id="offerDiscount" placeholder="25%">
+            </div>
+            <div class="form-group">
+                <label>تاريخ الانتهاء</label>
+                <input type="datetime-local" id="offerEndTime">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeOfferModal()">إلغاء</button>
+            <button class="btn btn-primary" onclick="saveOffer()">
+                <i class="fas fa-check"></i> حفظ
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { 
+    getFirestore, collection, doc, getDocs, addDoc, deleteDoc, updateDoc, 
+    query, orderBy, serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { 
+    getAuth, signInAnonymously, onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDGnZWZ8xdrXUSbC2YtfB-Or4AtJjPr4RE",
+    authDomain: "nestora-45be3.firebaseapp.com",
+    projectId: "nestora-45be3",
+    storageBucket: "nestora-45be3.firebasestorage.app",
+    messagingSenderId: "1045389211476",
+    appId: "1:1045389211476:web:7655190307348fe616bac1"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const ADMIN_PIN = "18Asaad22";
+
+let currentProducts = [];
+let currentOrders = [];
+let currentOffers = [];
+let editingProductId = null;
+let uploadedImageBase64 = null;
+
+// PIN Handling
+const pinInputs = document.querySelectorAll('.pin-input');
+pinInputs.forEach((input, index) => {
+    input.addEventListener('input', (e) => {
+        if (e.target.value.length === 1 && index < pinInputs.length - 1) {
+            pinInputs[index + 1].focus();
+        }
+    });
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !e.target.value && index > 0) {
+            pinInputs[index - 1].focus();
+        }
+    });
+});
+
+async function checkPin() {
+    const enteredPin = Array.from(pinInputs).map(i => i.value).join('');
+    if (enteredPin === ADMIN_PIN) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        showLoading();
+        await initAuth();
+        await loadAllData();
+        hideLoading();
+    } else {
+        document.getElementById('loginError').style.display = 'block';
+        pinInputs.forEach(i => i.value = '');
+        pinInputs[0].focus();
+    }
+}
+
+async function initAuth() {
+    return new Promise((resolve) => {
+        onAuthStateChanged(auth, (user) => {
+            if (user) resolve(user);
+            else signInAnonymously(auth).then(r => resolve(r.user)).catch(() => resolve(null));
+        });
+    });
+}
+
+function logout() {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('adminPanel').style.display = 'none';
+    pinInputs.forEach(i => i.value = '');
+    document.getElementById('loginError').style.display = 'none';
+}
+
+async function loadAllData() {
+    await Promise.all([loadProducts(), loadOrders(), loadOffers()]);
+    updateStats();
+}
+
+async function loadProducts() {
+    try {
+        const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
+        const snapshot = await getDocs(q);
+        currentProducts = [];
+        snapshot.forEach(doc => currentProducts.push({ id: doc.id, ...doc.data() }));
+        renderProducts();
+    } catch (error) { console.error('Error loading products:', error); }
+}
+
+async function loadOrders() {
+    try {
+        const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
+        const snapshot = await getDocs(q);
+        currentOrders = [];
+        snapshot.forEach(doc => currentOrders.push({ id: doc.id, ...doc.data() }));
+        renderOrders();
+    } catch (error) { console.error('Error loading orders:', error); }
+}
+
+async function loadOffers() {
+    try {
+        const q = query(collection(db, 'offers'), orderBy('createdAt', 'desc'));
+        const snapshot = await getDocs(q);
+        currentOffers = [];
+        snapshot.forEach(doc => currentOffers.push({ id: doc.id, ...doc.data() }));
+        renderOffers();
+    } catch (error) { console.error('Error loading offers:', error); }
+}
+
+function renderProducts() {
+    const tbody = document.getElementById('productsTableBody');
+    if (currentProducts.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fas fa-box-open"></i><p>لا توجد منتجات</p></div></td></tr>`;
+        return;
+    }
+    tbody.innerHTML = currentProducts.map(p => `
+        <tr>
+            <td>${p.imageBase64 ? `<img src="${p.imageBase64}" class="product-img-small" alt="${p.name}">` : `<div class="product-img-small" style="display:flex;align-items:center;justify-content:center;background:var(--light);font-size:1.5rem">📦</div>`}</td>
+            <td><strong>${p.name}</strong></td>
+            <td>${getCategoryName(p.category)}</td>
+            <td><strong style="color: var(--primary);">${p.price} ج.م</strong></td>
+            <td>${p.badge ? `<span class="badge badge-${p.badge}">${getBadgeName(p.badge)}</span>` : '-'}</td>
+            <td>
+                <div class="actions-cell">
+                    <button class="action-btn edit" onclick="editProduct('${p.id}')" title="تعديل"><i class="fas fa-edit"></i></button>
+                    <button class="action-btn delete" onclick="deleteProduct('${p.id}')" title="حذف"><i class="fas fa-trash"></i></button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderOrders() {
+    const tbody = document.getElementById('ordersTableBody');
+    if (currentOrders.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fas fa-shopping-basket"></i><p>لا توجد طلبات</p></div></td></tr>`;
+        return;
+    }
+    tbody.innerHTML = currentOrders.map(o => {
+        const date = o.createdAt ? new Date(o.createdAt.toDate()).toLocaleDateString('ar-EG') : '-';
+        return `<tr><td><strong>#${o.orderId || o.id.slice(-4)}</strong></td><td>${o.customerName || '-'}</td><td>${o.customerPhone || '-'}</td><td>${o.items ? o.items.length : 0} منتج</td><td><strong style="color: var(--primary);">${o.total || 0} ج.م</strong></td><td>${date}</td></tr>`;
+    }).join('');
+}
+
+function renderOffers() {
+    const tbody = document.getElementById('offersTableBody');
+    if (currentOffers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fas fa-fire"></i><p>لا توجد عروض</p></div></td></tr>`;
+        return;
+    }
+    tbody.innerHTML = currentOffers.map(o => `
+        <tr>
+            <td><strong>${o.title}</strong></td>
+            <td><span class="badge badge-sale">${o.discount}</span></td>
+            <td style="text-decoration: line-through; color: var(--gray);">${o.oldPrice} ج.م</td>
+            <td><strong style="color: var(--success);">${o.newPrice} ج.م</strong></td>
+            <td><button class="action-btn delete" onclick="deleteOffer('${o.id}')" title="حذف"><i class="fas fa-trash"></i></button></td>
+        </tr>
+    `).join('');
+}
+
+function updateStats() {
+    document.getElementById('statsProducts').textContent = currentProducts.length;
+    document.getElementById('statsOrders').textContent = currentOrders.length;
+    document.getElementById('statsOffers').textContent = currentOffers.length;
+    const revenue = currentOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+    document.getElementById('statsRevenue').textContent = revenue + ' ج.م';
+}
+
+function openProductModal(productId = null) {
+    editingProductId = productId;
+    document.getElementById('productModalTitle').innerHTML = productId ? '<i class="fas fa-edit"></i> تعديل منتج' : '<i class="fas fa-plus"></i> منتج جديد';
+    if (productId) {
+        const p = currentProducts.find(x => x.id === productId);
+        if (p) {
+            document.getElementById('productName').value = p.name || '';
+            document.getElementById('productCategory').value = p.category || 'kitchen';
+            document.getElementById('productPrice').value = p.price || '';
+            document.getElementById('productOldPrice').value = p.oldPrice || '';
+            document.getElementById('productDesc').value = p.desc || '';
+            document.getElementById('productTags').value = p.tags ? p.tags.join(', ') : '';
+            document.getElementById('productBadge').value = p.badge || '';
+            if (p.imageBase64) {
+                document.getElementById('imagePreview').src = p.imageBase64;
+                document.getElementById('imagePreview').classList.add('show');
+                uploadedImageBase64 = p.imageBase64;
+            }
+        }
+    } else {
+        clearProductForm();
+    }
+    document.getElementById('productModal').classList.add('active');
+}
+
+function closeProductModal() {
+    document.getElementById('productModal').classList.remove('active');
+    editingProductId = null;
+    uploadedImageBase64 = null;
+    clearProductForm();
+}
+
+function clearProductForm() {
+    document.getElementById('productName').value = '';
+    document.getElementById('productCategory').value = 'kitchen';
+    document.getElementById('productPrice').value = '';
+    document.getElementById('productOldPrice').value = '';
+    document.getElementById('productDesc').value = '';
+    document.getElementById('productTags').value = '';
+    document.getElementById('productBadge').value = '';
+    document.getElementById('imagePreview').classList.remove('show');
+    document.getElementById('productImageFile').value = '';
+}
+
+function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { showToast('الصورة كبيرة جداً. الحد الأقصى 2MB', 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        uploadedImageBase64 = e.target.result;
+        document.getElementById('imagePreview').src = uploadedImageBase64;
+        document.getElementById('imagePreview').classList.add('show');
+    };
+    reader.readAsDataURL(file);
+}
+
+async function saveProduct() {
+    const name = document.getElementById('productName').value.trim();
+    const category = document.getElementById('productCategory').value;
+    const price = parseFloat(document.getElementById('productPrice').value);
+    const oldPrice = parseFloat(document.getElementById('productOldPrice').value) || null;
+    const desc = document.getElementById('productDesc').value.trim();
+    const tagsStr = document.getElementById('productTags').value.trim();
+    const badge = document.getElementById('productBadge').value;
+
+    if (!name || !price) { showToast('اكملي البيانات المطلوبة', 'error'); return; }
+
+    showLoading();
+    const productData = {
+        name, category, price, oldPrice, desc,
+        tags: tagsStr ? tagsStr.split(',').map(t => t.trim()) : [],
+        badge: badge || null,
+        imageBase64: uploadedImageBase64 || null,
+        updatedAt: serverTimestamp()
+    };
+
+    try {
+        if (editingProductId) {
+            await updateDoc(doc(db, 'products', editingProductId), productData);
+            showToast('تم التعديل بنجاح!', 'success');
+        } else {
+            productData.createdAt = serverTimestamp();
+            await addDoc(collection(db, 'products'), productData);
+            showToast('تم الإضافة بنجاح!', 'success');
+        }
+        closeProductModal();
+        await loadProducts();
+        updateStats();
+    } catch (error) {
+        console.error('Error saving product:', error);
+        showToast('خطأ في الحفظ', 'error');
+    } finally { hideLoading(); }
+}
+
+async function editProduct(productId) { openProductModal(productId); }
+
+async function deleteProduct(productId) {
+    if (!confirm('هل أنتي متأكدة من الحذف؟')) return;
+    showLoading();
+    try {
+        await deleteDoc(doc(db, 'products', productId));
+        showToast('تم الحذف بنجاح!', 'success');
+        await loadProducts();
+        updateStats();
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        showToast('خطأ في الحذف', 'error');
+    } finally { hideLoading(); }
+}
+
+function openOfferModal() { document.getElementById('offerModal').classList.add('active'); }
+
+function closeOfferModal() {
+    document.getElementById('offerModal').classList.remove('active');
+    document.getElementById('offerTitle').value = '';
+    document.getElementById('offerDesc').value = '';
+    document.getElementById('offerOldPrice').value = '';
+    document.getElementById('offerNewPrice').value = '';
+    document.getElementById('offerDiscount').value = '';
+    document.getElementById('offerEndTime').value = '';
+}
+
+async function saveOffer() {
+    const title = document.getElementById('offerTitle').value.trim();
+    const desc = document.getElementById('offerDesc').value.trim();
+    const oldPrice = parseFloat(document.getElementById('offerOldPrice').value);
+    const newPrice = parseFloat(document.getElementById('offerNewPrice').value);
+    const discount = document.getElementById('offerDiscount').value.trim();
+    const endTime = document.getElementById('offerEndTime').value;
+
+    if (!title || !oldPrice || !newPrice) { showToast('اكملي البيانات المطلوبة', 'error'); return; }
+
+    showLoading();
+    try {
+        await addDoc(collection(db, 'offers'), {
+            title, desc, oldPrice, newPrice,
+            discount: discount || Math.round((1 - newPrice/oldPrice) * 100) + '%',
+            endTime: endTime ? new Date(endTime).toISOString() : null,
+            createdAt: serverTimestamp()
+        });
+        showToast('تم إضافة العرض!', 'success');
+        closeOfferModal();
+        await loadOffers();
+        updateStats();
+    } catch (error) {
+        console.error('Error saving offer:', error);
+        showToast('خطأ في الحفظ', 'error');
+    } finally { hideLoading(); }
+}
+
+async function deleteOffer(offerId) {
+    if (!confirm('هل أنتي متأكدة من الحذف؟')) return;
+    showLoading();
+    try {
+        await deleteDoc(doc(db, 'offers', offerId));
+        showToast('تم الحذف!', 'success');
+        await loadOffers();
+        updateStats();
+    } catch (error) {
+        console.error('Error deleting offer:', error);
+        showToast('خطأ في الحذف', 'error');
+    } finally { hideLoading(); }
+}
+
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabName + 'Tab').classList.add('active');
+    event.target.classList.add('active');
+}
+
+function getCategoryName(cat) {
+    const names = { kitchen: 'المطبخ', bathroom: 'الحمام', bedroom: 'غرفة النوم', living: 'غرفة المعيشة', laundry: 'غسيل الملابس', cleaning: 'تنظيف عام' };
+    return names[cat] || cat;
+}
+
+function getBadgeName(badge) {
+    const names = { sale: 'خصم', new: 'جديد', hot: 'الأكثر مبيعاً' };
+    return names[badge] || badge;
+}
+
+function showLoading() { document.getElementById('loadingOverlay').classList.add('active'); }
+function hideLoading() { document.getElementById('loadingOverlay').classList.remove('active'); }
+
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i><span>${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+window.checkPin = checkPin;
+window.logout = logout;
+window.switchTab = switchTab;
+window.openProductModal = openProductModal;
+window.closeProductModal = closeProductModal;
+window.saveProduct = saveProduct;
+window.editProduct = editProduct;
+window.deleteProduct = deleteProduct;
+window.handleImageUpload = handleImageUpload;
+window.openOfferModal = openOfferModal;
+window.closeOfferModal = closeOfferModal;
+window.saveOffer = saveOffer;
+window.deleteOffer = deleteOffer;
+</script>
+
+</body>
+</html>
